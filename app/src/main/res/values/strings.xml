@@ -1,4 +1,4 @@
 <resources>
-    <string name="app_name">BluetoothPrinter</string>
+    <string name="app_name">Bluetooth printer</string>
     <string name="action_settings">Settings</string>
 </resources>
