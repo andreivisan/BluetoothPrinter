@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import io.programminglife.bluetoothprinter.drivers.ESCPOSDriver;
 import io.programminglife.bluetoothprinter.listeners.RecyclerItemClickListener;
 
 public class MainActivity extends AppCompatActivity {
@@ -42,8 +43,8 @@ public class MainActivity extends AppCompatActivity {
     private BluetoothSocket mSocket;
     private BluetoothDevice mDevice;
 
-    private OutputStream mmOutputStream;
-    private InputStream mmInputStream;
+    private OutputStream mOutputStream;
+    private InputStream mInputStream;
     private Thread mWorkerThread;
 
     private List<BluetoothDevice> mPairedDevices;
@@ -97,13 +98,9 @@ public class MainActivity extends AppCompatActivity {
                 new RecyclerItemClickListener(this, new RecyclerItemClickListener.OnItemClickListener() {
                     @Override
                     public void onItemClick(View view, int position) {
-                        try {
-                            openBtConnection();
-                            mPrinterIcon.setVisibility(View.VISIBLE);
-                            mDevice = mPairedDevices.get(position);
-                        } catch (IOException e) {
-                            Log.e(tag, e.getMessage(), e);
-                        }
+                        openBtConnection();
+                        mPrinterIcon.setVisibility(View.VISIBLE);
+                        mDevice = mPairedDevices.get(position);
                     }
                 })
         );
@@ -131,20 +128,18 @@ public class MainActivity extends AppCompatActivity {
         return pairedBtDevices;
     }
 
-    private void openBtConnection() throws IOException {
+    private void openBtConnection() {
         try {
             // Standard SerialPortService ID
             UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
             mSocket = mDevice.createRfcommSocketToServiceRecord(uuid);
             mSocket.connect();
-            mmOutputStream = mSocket.getOutputStream();
-            mmInputStream = mSocket.getInputStream();
+            mOutputStream = mSocket.getOutputStream();
+            mInputStream = mSocket.getInputStream();
 
             beginListenForData();
 
             Snackbar.make(mCoordinatorLayout, "Bluetooth connection opened", Snackbar.LENGTH_SHORT).show();
-        } catch (NullPointerException e) {
-            Log.e(tag, e.getMessage(), e);
         } catch (Exception e) {
             Log.e(tag, e.getMessage(), e);
         }
@@ -165,10 +160,10 @@ public class MainActivity extends AppCompatActivity {
                 public void run() {
                     while (!Thread.currentThread().isInterrupted() && !stopWorker) {
                         try {
-                            int bytesAvailable = mmInputStream.available();
+                            int bytesAvailable = mInputStream.available();
                             if (bytesAvailable > 0) {
                                 byte[] packetBytes = new byte[bytesAvailable];
-                                mmInputStream.read(packetBytes);
+                                mInputStream.read(packetBytes);
                                 for (int i = 0; i < bytesAvailable; i++) {
                                     byte readByte = packetBytes[i];
                                     if (readByte == delimiter) {
@@ -180,7 +175,7 @@ public class MainActivity extends AppCompatActivity {
                                         readBufferPosition = 0;
                                         handler.post(new Runnable() {
                                             public void run() {
-                                                Snackbar.make(mCoordinatorLayout, "Data: " + data, Snackbar.LENGTH_SHORT).show();
+                                                Snackbar.make(mCoordinatorLayout, "Printer is ready", Snackbar.LENGTH_SHORT).show();
                                             }
                                         });
                                     } else {
@@ -195,8 +190,32 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
             mWorkerThread.start();
-        } catch (NullPointerException e) {
+        } catch (Exception e) {
             Log.e(tag, e.getMessage(), e);
+        }
+    }
+
+    private void sendDataToPrinter() {
+        try {
+            ESCPOSDriver escposDriver = new ESCPOSDriver();
+
+            String msgLeft = "Left";
+            msgLeft += "\n";
+            String msgCenter = "Center";
+            msgCenter += "\n";
+            String msgRight = "Rights";
+            msgRight += "\n";
+
+            //Initialize
+            escposDriver.initPrint(mOutputStream);
+
+            escposDriver.printLineAlignLeft(mOutputStream, msgLeft);
+            escposDriver.printLineAlignCenter(mOutputStream, msgCenter);
+            escposDriver.printLineAlignRight(mOutputStream, msgRight);
+
+            escposDriver.finishPrint(mOutputStream);
+
+            Snackbar.make(mCoordinatorLayout, "Data sent", Snackbar.LENGTH_SHORT).show();
         } catch (Exception e) {
             Log.e(tag, e.getMessage(), e);
         }
