@@ -5,7 +5,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.List;
@@ -22,13 +21,11 @@ public class PairedBtDevicesAdapter extends RecyclerView.Adapter<PairedBtDevices
     }
 
     public static class PairedBtDevicesViewHolder extends RecyclerView.ViewHolder {
-        public ImageView mPrinterIcon;
         public TextView mPrinterName;
 
         public PairedBtDevicesViewHolder(View itemView) {
             super(itemView);
 
-            mPrinterIcon = (ImageView)itemView.findViewById(R.id.printer_icon);
             mPrinterName = (TextView)itemView.findViewById(R.id.printer_name);
         }
     }
