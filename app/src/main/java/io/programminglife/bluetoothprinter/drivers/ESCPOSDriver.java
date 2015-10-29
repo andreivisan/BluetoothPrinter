@@ -1,4 +1,4 @@
-package io.programminglife.bluetoothprinter.driver;
+package io.programminglife.bluetoothprinter.drivers;
 
 import android.util.Log;
 

@@ -12,6 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,7 +26,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import io.programminglife.bluetoothprinter.listeners.RecyclerItemClickListener;
+
 public class MainActivity extends AppCompatActivity {
+
+    private static final String tag = MainActivity.class.getSimpleName();
 
     private CoordinatorLayout mCoordinatorLayout;
     private RecyclerView mRecyclerView;
@@ -41,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     private InputStream mmInputStream;
     private Thread mWorkerThread;
 
+    private List<BluetoothDevice> mPairedDevices;
     private byte[] readBuffer;
     private int readBufferPosition;
     private int counter;
@@ -59,11 +65,14 @@ public class MainActivity extends AppCompatActivity {
         mRecyclerView = (RecyclerView)findViewById(R.id.paired_bt_devices);
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
-        mPairedBtDevicesAdapter = new PairedBtDevicesAdapter(findPairedBtDevices());
+        mPairedDevices = findPairedBtDevices();
+        mPairedBtDevicesAdapter = new PairedBtDevicesAdapter(mPairedDevices);
         mRecyclerView.setAdapter(mPairedBtDevicesAdapter);
 
         mPrinterIcon = (ImageView)findViewById(R.id.printer_icon);
         mPrinterIcon.setVisibility(View.INVISIBLE);
+
+        setInteraction();
     }
 
     @Override
@@ -81,6 +90,23 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void setInteraction() {
+        mRecyclerView.addOnItemTouchListener(
+                new RecyclerItemClickListener(this, new RecyclerItemClickListener.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(View view, int position) {
+                        try {
+                            openBtConnection();
+                            mPrinterIcon.setVisibility(View.VISIBLE);
+                            mDevice = mPairedDevices.get(position);
+                        } catch (IOException e) {
+                            Log.e(tag, e.getMessage(), e);
+                        }
+                    }
+                })
+        );
     }
 
     private List<BluetoothDevice> findPairedBtDevices() {
@@ -118,9 +144,9 @@ public class MainActivity extends AppCompatActivity {
 
             Snackbar.make(mCoordinatorLayout, "Bluetooth connection opened", Snackbar.LENGTH_SHORT).show();
         } catch (NullPointerException e) {
-            e.printStackTrace();
+            Log.e(tag, e.getMessage(), e);
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(tag, e.getMessage(), e);
         }
     }
 
@@ -170,9 +196,9 @@ public class MainActivity extends AppCompatActivity {
             });
             mWorkerThread.start();
         } catch (NullPointerException e) {
-            e.printStackTrace();
+            Log.e(tag, e.getMessage(), e);
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(tag, e.getMessage(), e);
         }
     }
 }
