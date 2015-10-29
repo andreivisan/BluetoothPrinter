@@ -17,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.RelativeLayout;
 
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -42,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
     private BluetoothSocket mSocket;
     private BluetoothDevice mDevice;
 
-    private OutputStream mOutputStream;
+    private BufferedOutputStream mOutputStream;
     private InputStream mInputStream;
     private Thread mWorkerThread;
 
@@ -134,7 +135,8 @@ public class MainActivity extends AppCompatActivity {
             UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
             mSocket = mDevice.createRfcommSocketToServiceRecord(uuid);
             mSocket.connect();
-            mOutputStream = mSocket.getOutputStream();
+            OutputStream outputStream = mSocket.getOutputStream();
+            mOutputStream = new BufferedOutputStream(outputStream);
             mInputStream = mSocket.getInputStream();
 
             beginListenForData();
@@ -213,7 +215,8 @@ public class MainActivity extends AppCompatActivity {
             escposDriver.printLineAlignCenter(mOutputStream, msgCenter);
             escposDriver.printLineAlignRight(mOutputStream, msgRight);
 
-            escposDriver.finishPrint(mOutputStream);
+            mOutputStream.write(new byte[]{0x1B, 0x64, 0x10});
+            mOutputStream.flush();
 
             closeBT();
 

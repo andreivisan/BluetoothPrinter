@@ -2,8 +2,8 @@ package io.programminglife.bluetoothprinter.drivers;
 
 import android.util.Log;
 
+import java.io.BufferedOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 
 /**
  * Created by andreivisan on 10/28/15.
@@ -23,7 +23,7 @@ public class ESCPOSDriver {
     private static final byte[] INIT = {0x1B, 0x40};
     private static final byte[] STANDARD_MODE = {0x1B, 0x53};
 
-    public void initPrint(OutputStream bufferedOutputStream) {
+    public void initPrint(BufferedOutputStream bufferedOutputStream) {
         try {
             bufferedOutputStream.write(INIT);
             bufferedOutputStream.write(STANDARD_MODE);
@@ -32,7 +32,7 @@ public class ESCPOSDriver {
         }
     }
 
-    public void printLineAlignLeft(OutputStream bufferedOutputStream, String lineData) {
+    public void printLineAlignLeft(BufferedOutputStream bufferedOutputStream, String lineData) {
         try {
             bufferedOutputStream.write(ALIGN_LEFT);
             bufferedOutputStream.write(lineData.getBytes());
@@ -42,7 +42,7 @@ public class ESCPOSDriver {
         }
     }
 
-    public void printLineAlignCenter(OutputStream bufferedOutputStream, String lineData) {
+    public void printLineAlignCenter(BufferedOutputStream bufferedOutputStream, String lineData) {
         try {
             bufferedOutputStream.write(ALIGN_CENTER);
             bufferedOutputStream.write(lineData.getBytes());
@@ -52,7 +52,7 @@ public class ESCPOSDriver {
         }
     }
 
-    public void printLineAlignRight(OutputStream bufferedOutputStream, String lineData) {
+    public void printLineAlignRight(BufferedOutputStream bufferedOutputStream, String lineData) {
         try {
             bufferedOutputStream.write(ALIGN_RIGHT);
             bufferedOutputStream.write(lineData.getBytes());
@@ -62,7 +62,7 @@ public class ESCPOSDriver {
         }
     }
 
-    public void finishPrint(OutputStream bufferedOutputStream) {
+    public void finishPrint(BufferedOutputStream bufferedOutputStream) {
         try {
             bufferedOutputStream.write(PAPER_FEED);
             bufferedOutputStream.write(PAPER_CUT);
