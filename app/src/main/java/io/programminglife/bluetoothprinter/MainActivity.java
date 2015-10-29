@@ -17,6 +17,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String tag = MainActivity.class.getSimpleName();
 
     private CoordinatorLayout mCoordinatorLayout;
+    private RelativeLayout mTestPrinter;
     private RecyclerView mRecyclerView;
     private RecyclerView.LayoutManager mLayoutManager;
     private PairedBtDevicesAdapter mPairedBtDevicesAdapter;
@@ -50,7 +52,6 @@ public class MainActivity extends AppCompatActivity {
     private List<BluetoothDevice> mPairedDevices;
     private byte[] readBuffer;
     private int readBufferPosition;
-    private int counter;
     private volatile boolean stopWorker;
 
 
@@ -62,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         mCoordinatorLayout = (CoordinatorLayout)findViewById(R.id.main_layout);
+        mTestPrinter = (RelativeLayout)findViewById(R.id.test_printer_layout);
 
         mRecyclerView = (RecyclerView)findViewById(R.id.paired_bt_devices);
         mLayoutManager = new LinearLayoutManager(this);
@@ -104,6 +106,13 @@ public class MainActivity extends AppCompatActivity {
                     }
                 })
         );
+
+        mTestPrinter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendDataToPrinter();
+            }
+        });
     }
 
     private List<BluetoothDevice> findPairedBtDevices() {
@@ -216,6 +225,19 @@ public class MainActivity extends AppCompatActivity {
             escposDriver.finishPrint(mOutputStream);
 
             Snackbar.make(mCoordinatorLayout, "Data sent", Snackbar.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            Log.e(tag, e.getMessage(), e);
+        }
+    }
+
+    void closeBT() throws IOException {
+        try {
+            stopWorker = true;
+            mOutputStream.close();
+            mInputStream.close();
+            //mSocket.close();
+
+            Snackbar.make(mCoordinatorLayout, "Bluetooth closed", Snackbar.LENGTH_SHORT).show();
         } catch (Exception e) {
             Log.e(tag, e.getMessage(), e);
         }
