@@ -15,7 +15,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -34,7 +34,8 @@ public class MainActivity extends AppCompatActivity {
     private static final String tag = MainActivity.class.getSimpleName();
 
     private CoordinatorLayout mCoordinatorLayout;
-    private RelativeLayout mTestPrinter;
+    private TextView mTestPrinter;
+    private TextView mClosePrinter;
     private RecyclerView mRecyclerView;
     private RecyclerView.LayoutManager mLayoutManager;
     private PairedBtDevicesAdapter mPairedBtDevicesAdapter;
@@ -59,7 +60,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         mCoordinatorLayout = (CoordinatorLayout)findViewById(R.id.main_layout);
-        mTestPrinter = (RelativeLayout)findViewById(R.id.test_printer_layout);
+        mTestPrinter = (TextView)findViewById(R.id.test_printer);
+        mClosePrinter = (TextView)findViewById(R.id.close_printer);
 
         mRecyclerView = (RecyclerView)findViewById(R.id.paired_bt_devices);
         mLayoutManager = new LinearLayoutManager(this);
@@ -103,6 +105,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 sendDataToPrinter();
+            }
+        });
+
+        mClosePrinter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                closeBT();
             }
         });
     }
@@ -209,16 +218,27 @@ public class MainActivity extends AppCompatActivity {
             msgRight += "\n";
 
             //Initialize
-            escposDriver.initPrint(mOutputStream);
+            //escposDriver.initPrint(mOutputStream);
 
-            escposDriver.printLineAlignLeft(mOutputStream, msgLeft);
-            escposDriver.printLineAlignCenter(mOutputStream, msgCenter);
-            escposDriver.printLineAlignRight(mOutputStream, msgRight);
+//            escposDriver.printLineAlignLeft(mOutputStream, msgLeft);
+//            escposDriver.printLineAlignCenter(mOutputStream, msgCenter);
+//            escposDriver.printLineAlignRight(mOutputStream, msgRight);
+
+            mOutputStream.write(0x1b);
+            mOutputStream.write(0x69);
+            mOutputStream.write(0x61);
+            mOutputStream.write(0x00);
+
+            mOutputStream.write(0x1b);
+            mOutputStream.write(0x40);
+
+            mOutputStream.write(msgLeft.getBytes());
+
+            mOutputStream.write(0xFF);
+            mOutputStream.write(0x0C);
 
             mOutputStream.write(new byte[]{0x1B, 0x64, 0x10});
             mOutputStream.flush();
-
-            closeBT();
 
             Snackbar.make(mCoordinatorLayout, "Data sent", Snackbar.LENGTH_SHORT).show();
         } catch (Exception e) {
@@ -226,7 +246,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    void closeBT() throws IOException {
+    void closeBT() {
         try {
             stopWorker = true;
             mOutputStream.close();

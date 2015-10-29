@@ -37,23 +37,36 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
+
     <RelativeLayout
-        android:id="@+id/test_printer_layout"
         android:layout_width="match_parent"
-        android:layout_height="80dp"
-        android:layout_gravity="bottom"
-        android:background="@color/steel_blue">
+        android:layout_height="160dp"
+        android:layout_gravity="bottom">
 
         <TextView
-            android:id="@+id/checkoutItems"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:id="@+id/test_printer"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
             android:textSize="18sp"
             android:textStyle="bold"
             android:textColor="@color/white"
+            android:backgroundTint="@color/steel_blue"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
             android:text="TEST PRINTER"/>
+
+        <TextView
+            android:id="@+id/close_printer"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            android:backgroundTint="@color/colorAccent"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:layout_below="@+id/test_printer"
+            android:text="CLOSE PRINTER"/>
 
     </RelativeLayout>
 
