@@ -16,7 +16,7 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/book_cover"
+                android:id="@+id/printer_icon"
                 android:maxWidth="20dp"
                 android:maxHeight="35dp"
                 android:src="@mipmap/ic_print_black_18dp"
@@ -27,12 +27,11 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/book_title"
+                android:id="@+id/printer_name"
                 android:textSize="20sp"
-                android:text="Total Recall"
                 android:layout_alignParentTop="true"
-                android:layout_toRightOf="@+id/book_cover"
-                android:layout_toEndOf="@+id/book_cover"
+                android:layout_toRightOf="@+id/printer_icon"
+                android:layout_toEndOf="@+id/printer_icon"
                 android:layout_marginLeft="22dp"
                 android:layout_marginStart="22dp" />
 
