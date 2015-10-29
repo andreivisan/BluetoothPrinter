@@ -22,11 +22,13 @@ public class ESCPOSDriver {
     private static final byte[] BOLD_OFF = {0x1B, 0x45, 0};
     private static final byte[] INIT = {0x1B, 0x40};
     private static final byte[] STANDARD_MODE = {0x1B, 0x53};
+    private static final byte[] SWITCH_COMMAND = {0x1B, 0x69, 0x61, 0x00};
+    private static final byte[] FLUSH_COMMAND = {(byte)0xFF, 0x0C};
 
     public void initPrint(BufferedOutputStream bufferedOutputStream) {
         try {
+            bufferedOutputStream.write(SWITCH_COMMAND);
             bufferedOutputStream.write(INIT);
-            bufferedOutputStream.write(STANDARD_MODE);
         } catch (IOException e) {
             Log.e(tag, e.getMessage(), e);
         }
@@ -64,6 +66,16 @@ public class ESCPOSDriver {
 
     public void finishPrint(BufferedOutputStream bufferedOutputStream) {
         try {
+            bufferedOutputStream.write(PAPER_FEED);
+            bufferedOutputStream.write(PAPER_CUT);
+        } catch (IOException e) {
+            Log.e(tag, e.getMessage(), e);
+        }
+    }
+
+    public void flushCommand(BufferedOutputStream bufferedOutputStream) {
+        try {
+            bufferedOutputStream.write(FLUSH_COMMAND);
             bufferedOutputStream.write(PAPER_FEED);
             bufferedOutputStream.write(PAPER_CUT);
         } catch (IOException e) {

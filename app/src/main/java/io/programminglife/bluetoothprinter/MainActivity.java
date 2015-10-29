@@ -218,26 +218,14 @@ public class MainActivity extends AppCompatActivity {
             msgRight += "\n";
 
             //Initialize
-            //escposDriver.initPrint(mOutputStream);
+            escposDriver.initPrint(mOutputStream);
 
-//            escposDriver.printLineAlignLeft(mOutputStream, msgLeft);
-//            escposDriver.printLineAlignCenter(mOutputStream, msgCenter);
-//            escposDriver.printLineAlignRight(mOutputStream, msgRight);
+            escposDriver.printLineAlignLeft(mOutputStream, msgLeft);
+            escposDriver.printLineAlignCenter(mOutputStream, msgCenter);
+            escposDriver.printLineAlignRight(mOutputStream, msgRight);
 
-            mOutputStream.write(0x1b);
-            mOutputStream.write(0x69);
-            mOutputStream.write(0x61);
-            mOutputStream.write(0x00);
+            escposDriver.flushCommand(mOutputStream);
 
-            mOutputStream.write(0x1b);
-            mOutputStream.write(0x40);
-
-            mOutputStream.write(msgLeft.getBytes());
-
-            mOutputStream.write(0xFF);
-            mOutputStream.write(0x0C);
-
-            mOutputStream.write(new byte[]{0x1B, 0x64, 0x10});
             mOutputStream.flush();
 
             Snackbar.make(mCoordinatorLayout, "Data sent", Snackbar.LENGTH_SHORT).show();
