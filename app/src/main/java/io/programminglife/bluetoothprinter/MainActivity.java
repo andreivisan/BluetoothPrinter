@@ -11,12 +11,10 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import java.io.IOException;
@@ -39,7 +37,6 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView mRecyclerView;
     private RecyclerView.LayoutManager mLayoutManager;
     private PairedBtDevicesAdapter mPairedBtDevicesAdapter;
-    private ImageView mPrinterIcon;
 
     private BluetoothAdapter mBluetoothAdapter;
     private BluetoothSocket mSocket;
@@ -59,8 +56,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
 
         mCoordinatorLayout = (CoordinatorLayout)findViewById(R.id.main_layout);
         mTestPrinter = (RelativeLayout)findViewById(R.id.test_printer_layout);
@@ -71,9 +66,6 @@ public class MainActivity extends AppCompatActivity {
         mPairedDevices = findPairedBtDevices();
         mPairedBtDevicesAdapter = new PairedBtDevicesAdapter(mPairedDevices);
         mRecyclerView.setAdapter(mPairedBtDevicesAdapter);
-
-        mPrinterIcon = (ImageView)findViewById(R.id.printer_icon);
-        mPrinterIcon.setVisibility(View.INVISIBLE);
 
         setInteraction();
     }
@@ -100,9 +92,8 @@ public class MainActivity extends AppCompatActivity {
                 new RecyclerItemClickListener(this, new RecyclerItemClickListener.OnItemClickListener() {
                     @Override
                     public void onItemClick(View view, int position) {
-                        openBtConnection();
-                        mPrinterIcon.setVisibility(View.VISIBLE);
                         mDevice = mPairedDevices.get(position);
+                        openBtConnection();
                     }
                 })
         );
@@ -212,7 +203,7 @@ public class MainActivity extends AppCompatActivity {
             msgLeft += "\n";
             String msgCenter = "Center";
             msgCenter += "\n";
-            String msgRight = "Rights";
+            String msgRight = "Right";
             msgRight += "\n";
 
             //Initialize
@@ -223,6 +214,8 @@ public class MainActivity extends AppCompatActivity {
             escposDriver.printLineAlignRight(mOutputStream, msgRight);
 
             escposDriver.finishPrint(mOutputStream);
+
+            closeBT();
 
             Snackbar.make(mCoordinatorLayout, "Data sent", Snackbar.LENGTH_SHORT).show();
         } catch (Exception e) {
@@ -235,7 +228,7 @@ public class MainActivity extends AppCompatActivity {
             stopWorker = true;
             mOutputStream.close();
             mInputStream.close();
-            //mSocket.close();
+            mSocket.close();
 
             Snackbar.make(mCoordinatorLayout, "Bluetooth closed", Snackbar.LENGTH_SHORT).show();
         } catch (Exception e) {
